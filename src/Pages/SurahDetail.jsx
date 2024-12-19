@@ -4,6 +4,8 @@ import axios from 'axios';
 import { IoHome } from "react-icons/io5";
 import { FaPlay } from "react-icons/fa";
 import { FaPause } from "react-icons/fa";
+import { CiDark } from "react-icons/ci";
+import { CiLight } from "react-icons/ci";
 
 function SurahDetail() {
   const { id } = useParams(); // Ambil parameter ID dari URL
@@ -13,6 +15,9 @@ function SurahDetail() {
   // State untuk mengontrol apakah ayat diputar atau tidak
   const [playing, setPlaying] = useState(null); // null berarti tidak ada ayat yang diputar
   const [audio, setAudio] = useState(null); // Menyimpan objek audio untuk pemutaran
+  
+  // State untuk mode gelap
+  const [isDarkMode, setIsDarkMode] = useState(false);
 
   useEffect(() => {
     const getSurahDetail = async () => {
@@ -25,6 +30,12 @@ function SurahDetail() {
       }
     };
     getSurahDetail();
+
+    // Memeriksa apakah mode gelap disimpan di localStorage
+    const savedMode = localStorage.getItem('darkMode');
+    if (savedMode) {
+      setIsDarkMode(savedMode === 'true');
+    }
   }, [id]);
 
   const togglePlayPause = (verseIndex, audioUrl) => {
@@ -55,6 +66,18 @@ function SurahDetail() {
     }
   };
 
+  const toggleMode = () => {
+    setIsDarkMode(prevMode => {
+      const newMode = !prevMode;
+      // Simpan status mode ke localStorage
+      localStorage.setItem('darkMode', newMode.toString());
+      return newMode;
+    });
+  };
+
+  // Menentukan kelas untuk mode gelap atau terang
+  const modeClass = isDarkMode ? 'dark' : 'light';
+
   if (loading) {
     return (
       <div>
@@ -64,16 +87,21 @@ function SurahDetail() {
   }
 
   return (
-    <div className="flex justify-center items-center">
+    <div className={`flex justify-center items-center ${modeClass}`}>
       <div className="w-full max-w-3xl">
-        <div className="flex-col w-full bg-white p-5 rounded-md">
+        <div className={`flex-col w-full p-5 rounded-md ${isDarkMode ? 'bg-gray-800 text-white' : 'bg-white text-black'}`}>
           {/* Header Surah */}
-          <Link to={'/'}>
-            <IoHome className="text-2xl opacity-50" />
-          </Link>
+          <div className="flex justify-between">
+            <Link to={'/'}>
+              <IoHome className="text-2xl opacity-50" />
+            </Link>
+            <button onClick={toggleMode}>
+              {isDarkMode ? <CiLight className='text-3xl' /> : <CiDark className='text-3xl' />}
+            </button>
+          </div>
           <h1 className="text-xl text-center font-medium">{surah.name.transliteration.id}</h1>
           <p className="font-[Amiri] text-2xl text-center">{surah.name.short}</p>
-          <hr />
+          <hr className='opacity-50'/>
           <p className="mb-20 text-center opacity-50">
             Surah ke-{surah.number} | {surah.numberOfVerses} Ayat
           </p>
@@ -99,8 +127,8 @@ function SurahDetail() {
                 </div>
                 <p className="text-right font-[Amiri] text-2xl">{verse.text.arab}</p>
                 <p className="text-right opacity-70">{verse.text.transliteration.en}</p>
-                <p className="text-right mt-2">{verse.translation.id}</p>
-                <hr className="my-3" />
+                <p className="text-right mt-2 opacity-50">{verse.translation.id}</p>
+                <hr className="my-3 opacity-50" />
               </div>
             ))}
           </div>
