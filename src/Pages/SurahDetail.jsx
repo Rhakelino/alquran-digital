@@ -1,4 +1,4 @@
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useNavigate } from 'react-router-dom'; // Import useNavigate
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { IoHome } from "react-icons/io5";
@@ -9,6 +9,7 @@ import { CiLight } from "react-icons/ci";
 
 function SurahDetail() {
   const { id } = useParams(); // Ambil parameter ID dari URL
+  const navigate = useNavigate(); // Hook untuk redirect
   const [surah, setSurah] = useState(null); // Data surah
   const [loading, setLoading] = useState(true);
 
@@ -23,20 +24,30 @@ function SurahDetail() {
     const getSurahDetail = async () => {
       try {
         const response = await axios.get(`https://api.quran.gading.dev/surah/${id}`);
-        setSurah(response.data.data); // Simpan data surah
-        setLoading(false); // Matikan loading
+        
+        // Cek apakah data ditemukan
+        if (response.data && response.data.data) {
+          setSurah(response.data.data); // Simpan data surah
+          setLoading(false); // Matikan loading
+        } else {
+          // Jika tidak ada data (misalnya ID tidak valid)
+          setLoading(false); // Matikan loading
+          navigate('/notFound'); // Arahkan ke halaman Not Found
+        }
       } catch (error) {
         console.error('Error fetching surah detail:', error);
+        setLoading(false); // Matikan loading
+        navigate('/notFound'); // Arahkan ke halaman Not Found
       }
     };
     getSurahDetail();
-
+  
     // Memeriksa apakah mode gelap disimpan di localStorage
     const savedMode = localStorage.getItem('darkMode');
     if (savedMode) {
       setIsDarkMode(savedMode === 'true');
     }
-  }, [id]);
+  }, [id, navigate]); // Pastikan `navigate` ditambahkan sebagai dependency
 
   const togglePlayPause = (verseIndex, audioUrl) => {
     if (playing === verseIndex) {
@@ -87,56 +98,130 @@ function SurahDetail() {
   }
 
   return (
-    <div className={`flex justify-center items-center ${modeClass}`}>
-      <div className="w-full max-w-3xl">
-        <div className={`flex-col w-full p-5 rounded-md ${isDarkMode ? 'bg-gray-800 text-white' : 'bg-white text-black'}`}>
+ <div className={`
+      min-h-screen 
+      ${isDarkMode
+        ? 'bg-gradient-to-br from-[#1E1E1E] to-black'
+        : 'bg-gray-100'
+      } 
+      transition-colors duration-300 ease-in-out
+    `}>
+      <div className="container mx-auto md:px-4 md:py-8 max-w-3xl">
+        <div className={`
+          md:rounded-xl 
+          shadow-2xl 
+          p-6 
+          ${isDarkMode
+            ? 'bg-black text-gray-300 border border-[#2C2C2C]'
+            : 'bg-white text-gray-800'
+          } 
+          transition-all duration-300
+        `}>
           {/* Header Surah */}
-          <div className="flex justify-between">
+          <div className="flex justify-between items-center mb-6">
             <Link to={'/'}>
-              <IoHome className="text-2xl opacity-50" />
+              <IoHome className={`
+                text-2xl 
+                ${isDarkMode ? 'text-gray-400 hover:text-gray-200' : 'text-gray-600 hover:text-gray-800'}
+                transition-colors
+              `} />
             </Link>
-            <button onClick={toggleMode}>
-              {isDarkMode ? <CiLight className='text-3xl' /> : <CiDark className='text-3xl' />}
+            <button
+              onClick={toggleMode}
+              className={`
+                p-2 rounded-full transition-colors 
+                ${isDarkMode
+                  ? 'bg-neutral-800 text-gray-300 hover:bg-neutral-700'
+                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                }
+              `}
+            >
+              {isDarkMode ? <CiLight className='text-2xl' /> : <CiDark className='text-2xl' />}
             </button>
           </div>
-          <h1 className="text-xl text-center font-medium">{surah.name.transliteration.id}</h1>
-          <p className="font-[Amiri] text-2xl text-center">{surah.name.short}</p>
-          <hr className='opacity-50'/>
-          <p className="mb-20 text-center opacity-50">
-            Surah ke-{surah.number} | {surah.numberOfVerses} Ayat
-          </p>
+
+          {/* Informasi Surah */}
+          <div className="text-center mb-8">
+            <h1 className={`
+              text-xl font-medium 
+              ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}
+            `}>
+              {surah.name.transliteration.id}
+            </h1>
+            <p className={`
+              font-[Amiri] text-2xl 
+              ${isDarkMode ? 'text-gray-300' : 'text-gray-800'}
+            `}>
+              {surah.name.short}
+            </p>
+            <p className={`
+              mt-2 
+              ${isDarkMode ? 'text-gray-500' : 'text-gray-600'}
+            `}>
+              Surah ke-{surah.number} | {surah.numberOfVerses} Ayat
+            </p>
+          </div>
+
           {/* Daftar Ayat */}
-          <div className="mt-5">
+          <div className="space-y-4">
             {surah.verses.map((verse, i) => (
-              <div key={i} className="mb-4">
-                <div className="flex justify-between mb-10 items-center">
-                  <p className="">{i + 1}</p>
-                  <div className="flex gap-5">
-                    {/* Tombol Play / Pause */}
-                    <button
-                      onClick={() => togglePlayPause(i, verse.audio.primary)} // Pass URL audio untuk ayat ini
-                      className="opacity-50"
-                    >
-                      {playing === i ? (
-                        <FaPause className="text-xl" /> // Tampilkan Pause jika sedang diputar
-                      ) : (
-                        <FaPlay className="text-xl" /> // Tampilkan Play jika tidak diputar
-                      )}
-                    </button>
-                  </div>
+              <div 
+                key={i} 
+              >
+                <div className="flex justify-between items-center mb-4">
+                  <span className={`
+                    w-8 h-8 rounded-full flex items-center justify-center 
+                    ${isDarkMode 
+                      ? 'bg-neutral-700 text-gray-300' 
+                      : 'bg-gray-200 text-gray-700'
+                    }
+                  `}>
+                    {i + 1}
+                  </span>
+                  <button
+                    onClick={() => togglePlayPause(i, verse.audio.primary)}
+                    className={`
+                      p-2 rounded-full 
+                      ${isDarkMode 
+                        ? 'bg-neutral-700 text-gray-300 hover:bg-neutral-600' 
+                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                      }
+                      transition-colors
+                    `}
+                  >
+                    {playing === i ? <FaPause /> : <FaPlay />}
+                  </button>
                 </div>
-                <p className="text-right font-[Amiri] text-2xl">{verse.text.arab}</p>
-                <p className="text-right opacity-70">{verse.text.transliteration.en}</p>
-                <p className="text-right mt-2 opacity-50">{verse.translation.id}</p>
-                <hr className="my-3 opacity-50" />
+                
+                <p className={`
+                  text-right font-[Amiri] text-2xl mb-2 
+                  ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}
+                `}>
+                  {verse.text.arab}
+                </p>
+                <p className={`
+                  text-right text-sm mb-1 
+                  ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}
+                `}>
+                  {verse.text.transliteration.en}
+                </p>
+                <p className={`
+                  text-right 
+                  ${isDarkMode ? 'text-gray-500' : 'text-gray-700'}
+                `}>
+                  {verse.translation.id}
+                </p>
               </div>
             ))}
           </div>
         </div>
-        <footer className="footer footer-center bg-emerald-400 text-base-content p-4">
-          <aside className='text-center'>
-            <p className='font-medium'>Made With ❤️ By Rhakelino</p>
-          </aside>
+
+        {/* Footer */}
+        <footer className={`
+          text-center py-4 mt-4 
+          ${isDarkMode ? 'text-gray-500' : 'text-gray-600'}
+        `}>
+          <p className='font-medium'>Made With ❤️ By Rhakelino</p>
         </footer>
       </div>
     </div>

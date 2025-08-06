@@ -3,110 +3,192 @@ import axios from 'axios'
 import { Link } from 'react-router-dom'
 import { CiDark } from "react-icons/ci";
 import { CiLight } from "react-icons/ci";
+import { FaSearch } from "react-icons/fa";
 
 function Home() {
-    const [surahs, setSurah] = useState([]); // Data asli
-    const [filteredSurahs, setFilteredSurahs] = useState([]); // Data setelah filter
+    const [surahs, setSurah] = useState([]);
+    const [filteredSurahs, setFilteredSurahs] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [searchText, setSearchText] = useState(''); // State untuk pencarian
-    const [isDarkMode, setIsDarkMode] = useState(false); // State untuk mode gelap
+    const [searchText, setSearchText] = useState('');
+    const [isDarkMode, setIsDarkMode] = useState(false);
 
     useEffect(() => {
         const getData = async () => {
             try {
                 const response = await axios.get('https://api.quran.gading.dev/surah');
                 setSurah(response.data.data);
-                setFilteredSurahs(response.data.data); // Inisialisasi data yang difilter
+                setFilteredSurahs(response.data.data);
                 setLoading(false);
             } catch (error) {
-                console.error('Error fetching data:', error); // Tangani error jika terjadi
+                console.error('Error fetching data:', error);
             }
         };
         getData();
 
-        // Memeriksa apakah mode gelap disimpan di localStorage
         const savedMode = localStorage.getItem('darkMode');
         if (savedMode) {
             setIsDarkMode(savedMode === 'true');
         }
     }, []);
 
-    // Fungsi untuk menangani pencarian
     const handleSearch = (event) => {
         const text = event.target.value;
-        setSearchText(text); // Perbarui teks pencarian
+        setSearchText(text);
         const filtered = surahs.filter(surah =>
-            surah.name.transliteration.id.toLowerCase().includes(text.toLowerCase()) || // Filter nama transliterasi
-            surah.name.translation.id.toLowerCase().includes(text.toLowerCase()) || // Filter nama terjemahan
-            surah.number.toString().includes(text) // Filter berdasarkan nomor surah
+            surah.name.transliteration.id.toLowerCase().includes(text.toLowerCase()) ||
+            surah.name.translation.id.toLowerCase().includes(text.toLowerCase()) ||
+            surah.number.toString().includes(text)
         );
-        setFilteredSurahs(filtered); // Perbarui data yang difilter
+        setFilteredSurahs(filtered);
     };
 
-    // Fungsi untuk mengubah mode
     const toggleMode = () => {
         setIsDarkMode(prevMode => {
             const newMode = !prevMode;
-            // Simpan status mode ke localStorage
             localStorage.setItem('darkMode', newMode.toString());
             return newMode;
         });
     };
 
-    // Menentukan kelas untuk mode gelap atau terang
-    const modeClass = isDarkMode ? 'dark' : 'light';
-
     return (
-        <div className={`flex justify-center items-center ${modeClass}`}>
-            <div className="w-full max-w-3xl">
-                <div className={`flex-col w-full p-5 ${isDarkMode ? 'bg-gray-800 text-white' : 'bg-white text-black'}`}>
-                    <h1 className='my-5 opacity-50'>Al Quran</h1>
-                    <div className="flex justify-between">
-                        <h2 className='text-2xl font-medium mb-5'>Daftar Surah</h2>
-                        <div className="flex">
-                            <button onClick={toggleMode}>
-                                {isDarkMode ? <CiLight className='text-3xl' /> : <CiDark className='text-3xl' />}
-                            </button>
+        <div className={`
+            min-h-screen 
+            ${isDarkMode
+                ? 'bg-gradient-to-br from-[#1E2029] to-black'
+                : 'bg-gray-100'
+            } 
+            transition-colors duration-300 ease-in-out
+        `}>
+            <div className="container mx-auto md:px-4 md:py-8 max-w-3xl">
+                <div className={`
+    md:rounded-xl shadow-2xl p-6 
+    ${isDarkMode
+                        ? 'bg-black text-gray-300 border border-[#1E2330]'
+                        : 'bg-white text-gray-800'
+                    } 
+    transition-all duration-300
+`}>
+                    {/* Header */}
+                    <div className="flex justify-between items-center mb-6">
+                        <div>
+                            <h1 className={`
+                                text-md font-bold 
+                                ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}
+                            `}>
+                                Al Quran
+                            </h1>
+                            <h2 className={`
+                                text-2xl font-semibold 
+                                ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}
+                            `}>
+                                Daftar Surah
+                            </h2>
                         </div>
+                        <button
+                            onClick={toggleMode}
+                            className={`
+                                p-2 rounded-full transition-colors 
+                                ${isDarkMode
+                                    ? 'bg-neutral-800 text-gray-300 hover:bg-neutral-700'
+                                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                                }
+                            `}
+                        >
+                            {isDarkMode ? <CiLight className='text-2xl' /> : <CiDark className='text-2xl' />}
+                        </button>
                     </div>
-                    <input
-                        type="text"
-                        value={searchText}
-                        onChange={handleSearch} // Tambahkan handler pencarian
-                        className="w-full bg-[#F1F5F9] rounded-full py-2 px-3 placeholder:opacity-50 focus:outline-emerald-200 text-black"
-                        placeholder='Cari Surah'
-                    />
-                    {
-                        loading ? (
-                            <img src="/img/loading.png" className='mx-auto w-20' alt="Loading..." />
+
+                    {/* Search Input */}
+                    <div className="relative mb-6">
+                        <input
+                            type="text"
+                            value={searchText}
+                            onChange={handleSearch}
+                            className={`
+                                w-full py-3 px-4 pl-10 rounded-xl 
+                                ${isDarkMode
+                                    ? 'bg-neutral-800 text-gray-200 placeholder-gray-500 focus:ring-2 focus:ring-blue-600'
+                                    : 'bg-gray-200 text-gray-800 placeholder-gray-600 focus:ring-2 focus:ring-blue-500'
+                                } 
+                                transition-all duration-300
+                            `}
+                            placeholder='Cari Surah'
+                        />
+                        <FaSearch className={`
+                            absolute left-3 top-1/2 -translate-y-1/2 
+                            ${isDarkMode ? 'text-gray-500' : 'text-gray-500'}
+                        `} />
+                    </div>
+
+                    {/* Surah List */}
+                    <div className="space-y-2">
+                        {loading ? (
+                            <div className="flex justify-center items-center py-10">
+                                <img src="/img/loading.png" className='w-20' alt="Loading..." />
+                            </div>
                         ) : (
                             filteredSurahs.length > 0 ? (
                                 filteredSurahs.map((surah, i) => (
-                                    <Link to={`./surah/${surah.number}`} key={i}>
-                                        <div className="flex items-center py-4 gap-4 border-b border-slate-200">
-                                            <p className='font-medium mb-4'>{surah.number}</p>
-                                            <div className="flex w-full justify-between items-center">
-                                                <div className="flex w-full flex-col">
-                                                    <p className='font-medium'>{surah.name.transliteration.id}</p>
-                                                    <p className='opacity-50'>{surah.name.translation.id}</p>
+                                    <Link
+                                        to={`./surah/${surah.number}`}
+                                        key={i}
+                                        className={`
+                                            block rounded-lg py-4 
+                                        `}
+                                    >
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex items-center space-x-4">
+                                                <div className={`
+                                                    w-10 h-10 rounded-full flex items-center justify-center 
+                                                    ${isDarkMode
+                                                        ? 'bg-neutral-800 text-gray-300'
+                                                        : 'bg-gray-200 text-gray-700'
+                                                    }
+                                                `}>
+                                                    {surah.number}
                                                 </div>
-                                                <div className="flex">
-                                                    <span className='text-xl font-[Amiri]'>{surah.name.short}</span>
+                                                <div>
+                                                    <p className={`
+                                                        font-medium 
+                                                        ${isDarkMode ? 'text-gray-100' : 'text-gray-800'}
+                                                    `}>
+                                                        {surah.name.transliteration.id}
+                                                    </p>
+                                                    <p className={`
+                                                        text-sm 
+                                                        ${isDarkMode ? 'text-gray-500' : 'text-gray-600'}
+                                                    `}>
+                                                        {surah.name.translation.id}
+                                                    </p>
                                                 </div>
                                             </div>
+                                            <span className={`
+                                                text-xl font-[Amiri] 
+                                                ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}
+                                            `}>
+                                                {surah.name.short}
+                                            </span>
                                         </div>
                                     </Link>
                                 ))
                             ) : (
-                                <p className="text-center opacity-50 mt-5">Nama Surah Tidak Ditemukan</p>
+                                <p className={`
+                                    text-center py-4 
+                                    ${isDarkMode ? 'text-gray-500' : 'text-gray-600'}
+                                `}>
+                                    Nama Surah Tidak Ditemukan
+                                </p>
                             )
-                        )
-                    }
+                        )}
+                    </div>
                 </div>
-                <footer className="footer footer-center bg-emerald-400 text-base-content p-4">
-                    <aside className='text-center'>
-                        <p className='font-medium'>Made With ❤️ By Rhakelino</p>
-                    </aside>
+
+                {/* Footer */}
+                <footer className={`
+                    text-center py-4 mt-4 
+                    ${isDarkMode ? 'text-gray-500' : 'text-gray-600'}
+                `}>
+                    <p className='font-medium'>Made With ❤️ By Rhakelino</p>
                 </footer>
             </div>
         </div>
