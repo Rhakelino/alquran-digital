@@ -1,50 +1,159 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { IoHome } from 'react-icons/io5';
+import { FaWifi } from 'react-icons/fa';
+import { MdSignalWifiOff } from 'react-icons/md';
 
 function NotFound() {
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-blue-100 to-blue-300 p-4">
-      <div className="bg-white shadow-2xl rounded-2xl p-8 md:p-12 text-center max-w-md w-full">
-        <div className="mb-6">
-          <h1 className="text-6xl md:text-8xl font-bold text-blue-600 mb-4 animate-bounce">
-            404
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-[#121212] to-[#1E1E1E] p-4">
+      <div 
+        className="
+          bg-[#1E1E1E] 
+          border border-[#2C2C2C] 
+          shadow-2xl 
+          rounded-2xl 
+          p-8 
+          md:p-12 
+          text-center 
+          max-w-md 
+          w-full 
+          relative 
+          overflow-hidden
+        "
+      >
+        {/* Efek glow */}
+        <div 
+          className="
+            absolute 
+            -top-20 
+            -left-20 
+            w-64 
+            h-64 
+            bg-blue-600 
+            rounded-full 
+            opacity-20 
+            blur-3xl
+          "
+        ></div>
+
+        <div className="relative z-10 mb-6">
+          <div className="flex justify-center mb-4">
+            <MdSignalWifiOff 
+              className="
+                text-6xl 
+                text-red-500 
+                animate-pulse
+              " 
+            />
+          </div>
+          <h1 
+            className="
+              text-4xl 
+              md:text-6xl 
+              font-bold 
+              text-gray-100 
+              mb-4
+            "
+          >
+            Koneksi Terputus
           </h1>
-          <p className="text-xl md:text-2xl text-gray-700 mb-6">
-            Halaman yang Anda cari tidak ditemukan
+          <p 
+            className="
+              text-lg 
+              md:text-xl 
+              text-gray-400 
+              mb-6
+            "
+          >
+            Periksa Koneksi Internet Anda
           </p>
         </div>
 
-        <div className="space-y-4">
-          <div className="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-500">
-            <p className="text-blue-800">
-              Mungkin halaman telah dipindahkan atau tidak tersedia.
+        <div className="space-y-4 relative z-10">
+          <div 
+            className="
+              bg-[#2C2C2C] 
+              p-4 
+              rounded-lg 
+              border-l-4 
+              border-red-500
+            "
+          >
+            <p 
+              className="
+                text-gray-300
+                flex 
+                items-center 
+                justify-center
+                space-x-2
+              "
+            >
+              <FaWifi className="text-yellow-500" />
+              <span>Pastikan Anda terhubung ke internet</span>
             </p>
+          </div>
+
+          <div 
+            className="
+              bg-[#2C2C2C] 
+              p-4 
+              rounded-lg 
+              text-gray-400
+              text-sm
+            "
+          >
+            Coba:
+            <ul className="list-disc list-inside mt-2">
+              <li>Periksa sinyal Wi-Fi/data seluler</li>
+              <li>Restart aplikasi</li>
+            </ul>
           </div>
 
           <Link 
             to="/" 
             className="
-              flex items-center justify-center 
-              w-full py-3 
-              bg-blue-600 text-white 
+              flex 
+              items-center 
+              justify-center 
+              w-full 
+              py-3 
+              bg-[#2C2C2C] 
+              text-gray-200 
               rounded-lg 
-              hover:bg-blue-700 
+              hover:bg-[#3C3C3C] 
               transition-colors 
               duration-300 
               group
             "
           >
-            <IoHome className="mr-2 group-hover:animate-bounce" />
+            <IoHome 
+              className="
+                mr-2 
+                text-xl 
+                text-gray-400 
+                group-hover:text-white 
+                group-hover:animate-bounce
+              " 
+            />
             Kembali ke Beranda
           </Link>
         </div>
-      </div>
 
-      {/* Dekorasi tambahan */}
-      <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
-        <div className="absolute top-10 left-10 w-20 h-20 bg-blue-200 rounded-full opacity-50 animate-float"></div>
-        <div className="absolute bottom-10 right-10 w-16 h-16 bg-blue-200 rounded-full opacity-50 animate-float2"></div>
+        {/* Dekorasi tambahan */}
+        <div 
+          className="
+            absolute 
+            bottom-0 
+            left-0 
+            w-full 
+            h-1 
+            bg-gradient-to-r 
+            from-transparent 
+            via-red-500 
+            to-transparent
+          "
+        ></div>
       </div>
     </div>
   );

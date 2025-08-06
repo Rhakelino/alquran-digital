@@ -67,7 +67,7 @@ if (!self.define) {
     });
   };
 }
-define(['./workbox-ce4f0d5f'], (function (workbox) { 'use strict';
+define(['./workbox-e755d862'], (function (workbox) { 'use strict';
 
   self.skipWaiting();
   workbox.clientsClaim();
@@ -82,16 +82,16 @@ define(['./workbox-ce4f0d5f'], (function (workbox) { 'use strict';
     "revision": "3ca0b8505b4bec776b69afdba2768812"
   }, {
     "url": "index.html",
-    "revision": "0.dm6irmr3b0o"
+    "revision": "0.v6sk5oh9to8"
   }], {});
   workbox.cleanupOutdatedCaches();
   workbox.registerRoute(new workbox.NavigationRoute(workbox.createHandlerBoundToURL("index.html"), {
     allowlist: [/^\/$/]
   }));
-  workbox.registerRoute(/^https:\/\/api\.quran\.gading\.dev\/.*/i, new workbox.CacheFirst({
-    "cacheName": "api-cache",
+  workbox.registerRoute(/^https:\/\/api\.quran\.gading\.dev\/.*/i, new workbox.NetworkFirst({
+    "cacheName": "quran-api-cache",
     plugins: [new workbox.ExpirationPlugin({
-      maxEntries: 10,
+      maxEntries: 50,
       maxAgeSeconds: 86400
     }), new workbox.CacheableResponsePlugin({
       statuses: [0, 200]
