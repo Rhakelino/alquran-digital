@@ -5,13 +5,13 @@ import { VitePWA } from 'vite-plugin-pwa'
 export default defineConfig({
   plugins: [
     react(),
-    VitePWA({ 
+    VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'robots.txt', 'apple-touch-icon.png'],
       manifest: {
         name: 'Al Quran Digital',
         short_name: 'AlQuran',
-        description: 'Aplikasi Al Quran Digital',
+        description: 'Aplikasi Al Quran Digital Offline',
         theme_color: '#121212',
         icons: [
           {
@@ -23,12 +23,6 @@ export default defineConfig({
             src: '/icon-512x512.png',
             sizes: '512x512',
             type: 'image/png'
-          },
-          {
-            src: '/icon-512x512.png',
-            sizes: '512x512',
-            type: 'image/png',
-            purpose: 'any maskable'
           }
         ]
       },
@@ -37,12 +31,12 @@ export default defineConfig({
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/api\.quran\.gading\.dev\/.*/i,
-            handler: 'CacheFirst',
+            handler: 'NetworkFirst',
             options: {
-              cacheName: 'api-cache',
+              cacheName: 'quran-api-cache',
               expiration: {
-                maxEntries: 10,
-                maxAgeSeconds: 24 * 60 * 60 // 24 jam
+                maxEntries: 50,
+                maxAgeSeconds: 24 * 60 * 60
               },
               cacheableResponse: {
                 statuses: [0, 200]
@@ -51,7 +45,7 @@ export default defineConfig({
           }
         ]
       },
-       devOptions: {
+      devOptions: {
         enabled: true
       }
     })
