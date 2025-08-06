@@ -54,7 +54,7 @@ function Home() {
         <div className={`
             min-h-screen 
             ${isDarkMode
-                ? 'bg-gradient-to-br from-[#1E2029] to-black'
+                ? 'bg-gradient-to-br from-[#1E1E1E] to-black'
                 : 'bg-gray-100'
             } 
             transition-colors duration-300 ease-in-out
