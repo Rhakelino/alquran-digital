@@ -15,12 +15,12 @@ import {
 const JadwalSholat = () => {
   // State untuk lokasi dan jadwal
   const [lokasi, setLokasi] = useState({
-    kota: 'Padang',
-    latitude: -0.9470,  // Koordinat Padang
-    longitude: 100.4232
+    kota: 'Memuat Lokasi...',
+    latitude: null,
+    longitude: null
   });
   const [jadwal, setJadwal] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   // State untuk jam digital
@@ -72,7 +72,7 @@ const JadwalSholat = () => {
       setJadwal(result.data[hariIni].timings);
       setLoading(false);
     } catch (err) {
-      setError(err.message);
+      setError('Gagal mengambil jadwal sholat: ' + err.message);
       setLoading(false);
     }
   }, []);
@@ -81,6 +81,7 @@ const JadwalSholat = () => {
   const handleUpdateLokasi = useCallback(() => {
     if ("geolocation" in navigator) {
       setLoading(true);
+      setError(null);
       navigator.geolocation.getCurrentPosition(
         async (position) => {
           const newLokasi = {
@@ -92,32 +93,49 @@ const JadwalSholat = () => {
           try {
             // Ambil nama kota
             const response = await fetch(
-              `https://nominatim.openstreetmap.org/reverse?format=json&lat=${newLokasi.latitude}&lon=${newLokasi.longitude}`
+              `https://nominatim.openstreetmap.org/reverse?format=json&lat=${newLokasi.latitude}&lon=${newLokasi.longitude}&accept-language=id`
             );
             const data = await response.json();
-            newLokasi.kota = data.address.city || data.address.town || 'Lokasi Tidak Dikenal';
+            
+            // Coba berbagai properti untuk nama kota
+            newLokasi.kota = 
+              data.address.city || 
+              data.address.town || 
+              data.address.municipality ||
+              data.address.county || 
+              'Lokasi Tidak Dikenal';
+
+            console.log('Lokasi Terdeteksi:', newLokasi);
 
             setLokasi(newLokasi);
             await fetchJadwalSholat(newLokasi.latitude, newLokasi.longitude);
           } catch (err) {
-            setError('Gagal mendapatkan lokasi');
+            console.error('Gagal mendapatkan lokasi:', err);
+            setError('Gagal mendapatkan lokasi. Pastikan GPS aktif.');
             setLoading(false);
           }
         },
         (error) => {
-          setError('Izin lokasi ditolak');
+          console.error('Error geolokasi:', error);
+          setError('Izin lokasi ditolak. Aktifkan GPS dan coba lagi.');
           setLoading(false);
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 0
         }
       );
     } else {
-      setError('Geolokasi tidak didukung');
+      setError('Geolokasi tidak didukung di perangkat ini');
+      setLoading(false);
     }
   }, [fetchJadwalSholat]);
 
-  // Ambil jadwal sholat saat komponen dimuat
+  // Ambil lokasi dan jadwal saat komponen dimuat
   useEffect(() => {
-    fetchJadwalSholat(lokasi.latitude, lokasi.longitude);
-  }, [lokasi, fetchJadwalSholat]);
+    handleUpdateLokasi();
+  }, [handleUpdateLokasi]);
 
   // Daftar waktu sholat
   const waktuSholat = [
@@ -141,6 +159,12 @@ const JadwalSholat = () => {
       <div className="flex items-center">
         <FaExclamationTriangle className="mr-2" />
         {error}
+        <button 
+          onClick={handleUpdateLokasi} 
+          className="ml-4 bg-red-500 text-white px-3 py-1 rounded"
+        >
+          Coba Lagi
+        </button>
       </div>
     </div>
   );
