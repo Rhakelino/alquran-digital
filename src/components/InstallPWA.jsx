@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { IoClose } from 'react-icons/io5'; // Pastikan impor icon close
 
 const InstallPWA = () => {
   const [deferredPrompt, setDeferredPrompt] = useState(null);
@@ -52,6 +53,11 @@ const InstallPWA = () => {
 `);
   };
 
+  // Fungsi untuk menutup banner
+  const handleCloseBanner = () => {
+    setShowBanner(false);
+  };
+
   if (!showBanner) return null;
 
   return (
@@ -63,25 +69,43 @@ const InstallPWA = () => {
       flex justify-between items-center 
       z-50
     `}>
-      <span className="text-sm">
+      <span className="text-sm flex-grow pr-4">
         {isIOS 
           ? "Ingin menggunakan aplikasi di iOS?" 
           : "Ingin menggunakan aplikasi offline?"}
       </span>
-      <button 
-        onClick={isIOS ? handleIOSInstall : handleInstallClick}
-        className="
-          bg-blue-600 
-          text-white 
-          px-3 py-1 
-          rounded-full 
-          text-sm
-          hover:bg-blue-700 
-          transition-colors
-        "
-      >
-        {isIOS ? 'Petunjuk Install' : 'Pasang Sekarang'}
-      </button>
+      
+      <div className="flex items-center space-x-2">
+        <button 
+          onClick={isIOS ? handleIOSInstall : handleInstallClick}
+          className="
+            bg-blue-600 
+            text-white 
+            px-3 py-1 
+            rounded-full 
+            text-sm
+            hover:bg-blue-700 
+            transition-colors
+            mr-2
+          "
+        >
+          {isIOS ? 'Petunjuk Install' : 'Pasang Sekarang'}
+        </button>
+        
+        <button 
+          onClick={handleCloseBanner}
+          className="
+            text-gray-300 
+            hover:text-white 
+            transition-colors
+            p-1
+            rounded-full
+            hover:bg-white/20
+          "
+        >
+          <IoClose className="text-xl" />
+        </button>
+      </div>
     </div>
   );
 };
