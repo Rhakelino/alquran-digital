@@ -170,54 +170,54 @@ const JadwalSholat = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-100 to-blue-300 p-4 flex items-center justify-center">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden">
-        {/* Header */}
-        <div className="bg-blue-600 text-white p-6">
-          <div className="flex items-center justify-center mb-2">
-            <FaMosque className="mr-2 text-2xl" />
-            <h1 className="text-2xl font-bold text-white">Jadwal Sholat</h1>
-          </div>
-          <div className="flex items-center justify-center">
-            <FaMapMarkerAlt className="mr-2" />
-            <span className="text-white font-medium">{lokasi.kota}</span>
-          </div>
-          
-          {/* Jam Digital */}
-          <div className="text-center mt-4 text-sm text-blue-100">
-            {formatWaktu(waktuSekarang)}
-          </div>
-        </div>
-
-        {/* Tombol Refresh */}
-        <div className="p-4 text-center">
-          <button 
-            onClick={handleUpdateLokasi}
-            className="bg-blue-500 text-white px-6 py-2 rounded-lg flex items-center mx-auto hover:bg-blue-600 transition-colors"
-          >
-            <FaSync className="mr-2" /> Perbarui Lokasi
-          </button>
-        </div>
-
-        {/* Jadwal Sholat */}
-        <div className="p-4 space-y-3">
-          {waktuSholat.map((sholat) => (
-            <div 
-              key={sholat.nama} 
-              className="flex justify-between items-center bg-blue-50 p-3 rounded-lg hover:bg-blue-100 transition-colors"
-            >
-              <div className="flex items-center">
-                <span className="text-2xl mr-3">{sholat.icon}</span>
-                <span className="text-gray-800 font-medium">{sholat.nama}</span>
-              </div>
-              <span className="font-bold text-blue-700">
-                {jadwal ? jadwal[sholat.key].split(' ')[0] : '-'}
-              </span>
-            </div>
-          ))}
-        </div>
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 p-4 flex items-center justify-center">
+  <div className="w-full max-w-md bg-gray-800 rounded-2xl shadow-2xl overflow-hidden">
+    {/* Header */}
+    <div className="bg-gray-700 text-white p-6">
+      <div className="flex items-center justify-center mb-2">
+        <FaMosque className="mr-2 text-2xl" />
+        <h1 className="text-2xl font-bold text-white">Jadwal Sholat</h1>
+      </div>
+      <div className="flex items-center justify-center">
+        <FaMapMarkerAlt className="mr-2" />
+        <span className="text-white font-medium">{lokasi.kota}</span>
+      </div>
+      
+      {/* Jam Digital */}
+      <div className="text-center mt-4 text-sm text-gray-300">
+        {formatWaktu(waktuSekarang)}
       </div>
     </div>
+
+    {/* Tombol Refresh */}
+    <div className="p-4 text-center">
+      <button 
+        onClick={handleUpdateLokasi}
+        className="bg-gray-600 text-white px-6 py-2 rounded-lg flex items-center mx-auto hover:bg-gray-700 transition-colors"
+      >
+        <FaSync className="mr-2" /> Perbarui Lokasi
+      </button>
+    </div>
+
+    {/* Jadwal Sholat */}
+    <div className="p-4 space-y-3">
+      {waktuSholat.map((sholat) => (
+        <div 
+          key={sholat.nama} 
+          className="flex justify-between items-center bg-gray-700 p-3 rounded-lg hover:bg-gray-600 transition-colors"
+        >
+          <div className="flex items-center">
+            <span className="text-2xl mr-3">{sholat.icon}</span>
+            <span className="text-white font-medium">{sholat.nama}</span>
+          </div>
+          <span className="font-bold text-blue-300">
+            {jadwal ? jadwal[sholat.key].split(' ')[0] : '-'}
+          </span>
+        </div>
+      ))}
+    </div>
+  </div>
+</div>
   );
 };
 

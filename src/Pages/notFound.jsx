@@ -1,8 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { IoHome } from 'react-icons/io5';
-import { FaWifi } from 'react-icons/fa';
-import { MdSignalWifiOff } from 'react-icons/md';
+import { FaSearchMinus } from 'react-icons/fa';
+import { MdErrorOutline} from 'react-icons/md';
 
 function NotFound() {
   return (
@@ -30,7 +30,7 @@ function NotFound() {
             -left-20 
             w-64 
             h-64 
-            bg-blue-600 
+            bg-purple-600 
             rounded-full 
             opacity-20 
             blur-3xl
@@ -39,10 +39,10 @@ function NotFound() {
 
         <div className="relative z-10 mb-6">
           <div className="flex justify-center mb-4">
-            <MdSignalWifiOff 
+            <MdErrorOutline
               className="
                 text-6xl 
-                text-red-500 
+                text-purple-500 
                 animate-pulse
               " 
             />
@@ -56,7 +56,7 @@ function NotFound() {
               mb-4
             "
           >
-            Koneksi Terputus
+            404
           </h1>
           <p 
             className="
@@ -66,7 +66,7 @@ function NotFound() {
               mb-6
             "
           >
-            Periksa Koneksi Internet Anda
+            Halaman Tidak Ditemukan
           </p>
         </div>
 
@@ -77,7 +77,7 @@ function NotFound() {
               p-4 
               rounded-lg 
               border-l-4 
-              border-red-500
+              border-purple-500
             "
           >
             <p 
@@ -89,8 +89,8 @@ function NotFound() {
                 space-x-2
               "
             >
-              <FaWifi className="text-yellow-500" />
-              <span>Pastikan Anda terhubung ke internet</span>
+              <FaSearchMinus className="text-purple-500" />
+              <span>Url yang Anda cari tidak tersedia</span>
             </p>
           </div>
 
@@ -103,10 +103,11 @@ function NotFound() {
               text-sm
             "
           >
-            Coba:
+            Beberapa kemungkinan:
             <ul className="list-disc list-inside mt-2">
-              <li>Periksa sinyal Wi-Fi/data seluler</li>
-              <li>Restart aplikasi</li>
+              <li>Link mungkin salah</li>
+              <li>Halaman telah dihapus</li>
+              <li>Url tidak valid</li>
             </ul>
           </div>
 
@@ -150,7 +151,7 @@ function NotFound() {
             h-1 
             bg-gradient-to-r 
             from-transparent 
-            via-red-500 
+            via-purple-500 
             to-transparent
           "
         ></div>
