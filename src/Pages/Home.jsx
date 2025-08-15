@@ -10,7 +10,7 @@ function Home() {
     const [filteredSurahs, setFilteredSurahs] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchText, setSearchText] = useState('');
-    const [isDarkMode, setIsDarkMode] = useState(false);
+    const [isDarkMode, setIsDarkMode] = useState('true');
 
     useEffect(() => {
         const getData = async () => {

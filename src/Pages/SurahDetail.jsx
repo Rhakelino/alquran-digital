@@ -1,11 +1,13 @@
 import { Link, useParams, useNavigate } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react'; // Add useRef here
 import axios from 'axios';
 import { IoHome } from "react-icons/io5";
 import { FaPlay } from "react-icons/fa";
 import { FaPause } from "react-icons/fa";
 import { CiDark } from "react-icons/ci";
 import { CiLight } from "react-icons/ci";
+import { FaCheck } from "react-icons/fa";
+import { FaTimes } from "react-icons/fa"; // Add this import
 
 function SurahDetail() {
   const { id } = useParams();
@@ -18,9 +20,64 @@ function SurahDetail() {
   // State untuk mengontrol audio
   const [playing, setPlaying] = useState(null);
   const [audio, setAudio] = useState(null);
-  
+
   // State untuk mode gelap
   const [isDarkMode, setIsDarkMode] = useState(false);
+
+  // State untuk memilih ayat terakhir
+  const [selectedVerse, setSelectedVerse] = useState(null);
+
+  // New states for long press and success modal
+  const [longPressVerse, setLongPressVerse] = useState(null);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const longPressTimerRef = useRef(null);
+  const [showTooltip, setShowTooltip] = useState(true);
+
+
+  const handleCloseTooltip = () => {
+  setShowTooltip(false);
+  localStorage.setItem('longPressTooltipDismissed', 'true');
+};
+
+useEffect(() => {
+  const tooltipDismissed = localStorage.getItem('longPressTooltipDismissed');
+  if (tooltipDismissed === 'true') {
+    setShowTooltip(false);
+  }
+}, []);
+
+  // Long Press Handler
+  const handleLongPressStart = (verseNumber) => {
+    longPressTimerRef.current = setTimeout(() => {
+      setLongPressVerse(verseNumber);
+    }, 500); // 500ms long press duration
+  };
+
+  const handleLongPressEnd = () => {
+    if (longPressTimerRef.current) {
+      clearTimeout(longPressTimerRef.current);
+    }
+  };
+
+  // Confirm Last Read
+  const confirmLastRead = () => {
+    if (longPressVerse) {
+      saveLastReadVerse(longPressVerse);
+      setShowSuccessModal(true);
+      setSelectedVerse(longPressVerse);
+      setLongPressVerse(null);
+
+      // Auto-hide success modal after 2 seconds
+      setTimeout(() => {
+        setShowSuccessModal(false);
+      }, 2000);
+    }
+  };
+
+  // Cancel Last Read
+  const cancelLastRead = () => {
+    setLongPressVerse(null);
+  };
 
   // Fungsi cache
   const saveSurahToCache = (surahData) => {
@@ -41,6 +98,23 @@ function SurahDetail() {
     }
   };
 
+  // Fungsi untuk menyimpan ayat terakhir
+  const saveLastReadVerse = useCallback((verseNumber) => {
+    if (!surah) return;
+
+    try {
+      const lastReadData = {
+        surahNumber: surah.number,
+        surahName: surah.name.transliteration.id,
+        verseNumber: verseNumber
+      };
+
+      localStorage.setItem('lastRead', JSON.stringify(lastReadData));
+    } catch (error) {
+      console.error('Error saving last read verse', error);
+    }
+  }, [surah]);
+
   // Effect untuk status online/offline
   useEffect(() => {
     const checkOnlineStatus = () => {
@@ -55,6 +129,18 @@ function SurahDetail() {
       window.removeEventListener('offline', checkOnlineStatus);
     };
   }, []);
+
+  // Effect untuk menyimpan terakhir baca
+  useEffect(() => {
+    // Muat data terakhir baca saat komponen dimuat
+    const savedLastRead = localStorage.getItem('lastRead');
+    if (savedLastRead) {
+      const parsedLastRead = JSON.parse(savedLastRead);
+      if (parsedLastRead.surahNumber === parseInt(id)) {
+        setSelectedVerse(parsedLastRead.verseNumber);
+      }
+    }
+  }, [id]);
 
   // Effect untuk mengambil data surah
   useEffect(() => {
@@ -78,7 +164,7 @@ function SurahDetail() {
         const response = await axios.get(`https://api.quran.gading.dev/surah/${id}`, {
           timeout: 10000
         });
-        
+
         if (response.data && response.data.data) {
           setSurah(response.data.data);
           saveSurahToCache(response.data.data);
@@ -88,7 +174,7 @@ function SurahDetail() {
         }
       } catch (error) {
         console.error('Error fetching surah detail:', error);
-        
+
         const cachedSurah = getSurahFromCache();
         if (cachedSurah) {
           setSurah(cachedSurah);
@@ -110,6 +196,7 @@ function SurahDetail() {
 
     getSurahDetail();
   }, [id, navigate]);
+
 
   // Toggle audio
   const togglePlayPause = (verseIndex, audioUrl) => {
@@ -172,7 +259,7 @@ function SurahDetail() {
       <div className="flex flex-col justify-center items-center min-h-screen text-center">
         <h1 className="text-2xl font-bold text-red-500">Error</h1>
         <p>{error}</p>
-        <button 
+        <button
           onClick={() => window.location.reload()}
           className="mt-4 px-4 py-2 bg-blue-500 text-white rounded"
         >
@@ -184,6 +271,94 @@ function SurahDetail() {
 
   return (
     <>
+
+    {showTooltip && (
+  <div className="fixed top-0 left-0 right-0 z-50 flex justify-center">
+    <div className={`
+      mt-4 p-4 rounded-lg shadow-lg 
+      flex items-center justify-between
+      max-w-md w-full
+      ${isDarkMode 
+        ? 'bg-blue-900 text-blue-200' 
+        : 'bg-blue-500 text-white'}
+      animate-bounce
+    `}>
+      <div className="flex items-center space-x-2">
+        <span>💡</span>
+        <p>Tahan ayat untuk menandai terakhir dibaca</p>
+      </div>
+      <button 
+        onClick={handleCloseTooltip}
+        className={`
+          p-1 rounded-full
+          ${isDarkMode 
+            ? 'hover:bg-blue-800' 
+            : 'hover:bg-blue-600'}
+        `}
+      >
+        <FaTimes />
+      </button>
+    </div>
+  </div>
+)}
+
+      {/* Long Press Modal */}
+      {longPressVerse && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className={`
+            p-6 rounded-lg w-80 
+            ${isDarkMode
+              ? 'bg-neutral-800 text-gray-300'
+              : 'bg-white text-gray-800'}
+          `}>
+            <h2 className="text-lg font-bold mb-4">
+              Tandai Terakhir Dibaca
+            </h2>
+            <p className="mb-4">
+              Apakah Anda ingin menandai ayat {longPressVerse} sebagai terakhir dibaca?
+            </p>
+            <div className="flex justify-between">
+              <button
+                onClick={cancelLastRead}
+                className={`
+                  flex items-center gap-2 px-4 py-2 rounded
+                  ${isDarkMode
+                    ? 'bg-neutral-700 text-gray-300 hover:bg-neutral-600'
+                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}
+                `}
+              >
+                <FaTimes /> Batal
+              </button>
+              <button
+                onClick={confirmLastRead}
+                className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+              >
+                <FaCheck /> Simpan
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Success Modal */}
+      {showSuccessModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className={`
+            p-6 rounded-lg w-80 text-center
+            ${isDarkMode
+              ? 'bg-green-900 text-green-300'
+              : 'bg-green-500 text-white'}
+          `}>
+            <FaCheck className="mx-auto text-4xl mb-4" />
+            <h2 className="text-lg font-bold mb-2">
+              Berhasil
+            </h2>
+            <p>
+              Ayat {selectedVerse} telah ditandai sebagai terakhir dibaca
+            </p>
+          </div>
+        </div>
+      )}
       {isOffline && <OfflineWarning />}
       <div className={`
         min-h-screen 
@@ -252,23 +427,49 @@ function SurahDetail() {
             {/* Daftar Ayat */}
             <div className="space-y-4">
               {surah.verses.map((verse, i) => (
-                <div key={i}>
+                <div
+                  key={i}
+                  onTouchStart={() => handleLongPressStart(i + 1)}
+                  onTouchEnd={handleLongPressEnd}
+                  onMouseDown={() => handleLongPressStart(i + 1)}
+                  onMouseUp={handleLongPressEnd}
+                  onMouseLeave={handleLongPressEnd}
+                  className={`
+    cursor-pointer 
+    p-2 rounded-lg 
+    transition-colors 
+    ${selectedVerse === i + 1
+                      ? (isDarkMode
+                        ? 'bg-blue-900/50 border-l-4 border-blue-500'
+                        : 'bg-blue-100 border-l-4 border-blue-500')
+                      : ''
+                    }
+  `}
+                >
                   <div className="flex justify-between items-center mb-4">
-                    <span className={`
-                      w-8 h-8 rounded-full flex items-center justify-center 
-                      ${isDarkMode 
-                        ? 'bg-neutral-700 text-gray-300' 
-                        : 'bg-gray-200 text-gray-700'
-                      }
-                    `}>
-                      {i + 1}
-                    </span>
+                    <div className="flex items-center space-x-2">
+                      <span className={`
+                        w-8 h-8 rounded-full flex items-center justify-center 
+                        ${isDarkMode
+                          ? 'bg-neutral-700 text-gray-300'
+                          : 'bg-gray-200 text-gray-700'
+                        }
+                      `}>
+                        {i + 1}
+                      </span>
+                      {selectedVerse === i + 1 && (
+                        <FaCheck className="text-blue-500" />
+                      )}
+                    </div>
                     <button
-                      onClick={() => togglePlayPause(i, verse.audio.primary)}
+                      onClick={(e) => {
+                        e.stopPropagation(); // Mencegah trigger onClick div
+                        togglePlayPause(i, verse.audio.primary);
+                      }}
                       className={`
                         p-2 rounded-full 
-                        ${isDarkMode 
-                          ? 'bg-neutral-700 text-gray-300 hover:bg-neutral-600' 
+                        ${isDarkMode
+                          ? 'bg-neutral-700 text-gray-300 hover:bg-neutral-600'
                           : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                         }
                         transition-colors
@@ -277,7 +478,7 @@ function SurahDetail() {
                       {playing === i ? <FaPause /> : <FaPlay />}
                     </button>
                   </div>
-                  
+
                   <p className={`
                     text-right font-[Amiri] text-2xl mb-2 
                     ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}
@@ -291,7 +492,7 @@ function SurahDetail() {
                     {verse.text.transliteration.en}
                   </p>
                   <p className={`
-                    text-right 
+                    text-left 
                     ${isDarkMode ? 'text-gray-500' : 'text-gray-700'}
                   `}>
                     {verse.translation.id}
@@ -306,7 +507,11 @@ function SurahDetail() {
             text-center py-4 mt-4 
             ${isDarkMode ? 'text-gray-500' : 'text-gray-600'}
           `}>
-            <p className='font-medium'>Made With ❤️ By Rhakelino</p>
+            <p className='font-medium'>
+              {selectedVerse
+                ? `Terakhir dibaca ayat ${selectedVerse}`
+                : 'Made With ❤️ By Rhakelino'}
+            </p>
           </footer>
         </div>
       </div>
