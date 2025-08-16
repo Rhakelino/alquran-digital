@@ -32,10 +32,10 @@ function SurahDetail() {
   const [longPressVerse, setLongPressVerse] = useState(null);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showTooltip, setShowTooltip] = useState(true);
-  
+
   // State for storing the verse to scroll to
   const [scrollToVerse, setScrollToVerse] = useState(null);
-  
+
   // Refs for verses
   const verseRefs = useRef({});
 
@@ -445,21 +445,23 @@ function SurahDetail() {
               {surah.verses.map((verse, i) => (
                 <div
                   key={i}
-                  id={`ayat-${i+1}`}
-                  ref={el => verseRefs.current[i+1] = el}
+                  id={`ayat-${i + 1}`}
+                  ref={el => verseRefs.current[i + 1] = el}
                   onClick={() => setLongPressVerse(i + 1)}
                   className={`
-                    cursor-pointer 
-                    p-2 rounded-lg 
-                    transition-colors
-                    ${isDarkMode ? 'hover:bg-neutral-600' : 'hover:bg-neutral-300'}
-                    ${selectedVerse === i + 1
+    cursor-pointer 
+    p-2 rounded-lg 
+    transition-colors
+    ${isDarkMode
+                      ? '@media (hover: hover) { hover:bg-neutral-600 }'
+                      : '@media (hover: hover) { hover:bg-neutral-300 }'}
+    ${selectedVerse === i + 1
                       ? (isDarkMode
                         ? 'bg-neutral-800 border-l-4 border-neutal-500'
                         : 'bg-blue-100 border-l-4 border-blue-500')
                       : ''
                     }
-                  `}
+  `}
                 >
                   <div className="flex justify-between items-center mb-4">
                     <div className="flex items-center space-x-2">
