@@ -35,16 +35,16 @@ function SurahDetail() {
 
 
   const handleCloseTooltip = () => {
-  setShowTooltip(false);
-  localStorage.setItem('longPressTooltipDismissed', 'true');
-};
-
-useEffect(() => {
-  const tooltipDismissed = localStorage.getItem('longPressTooltipDismissed');
-  if (tooltipDismissed === 'true') {
     setShowTooltip(false);
-  }
-}, []);
+    localStorage.setItem('longPressTooltipDismissed', 'true');
+  };
+
+  useEffect(() => {
+    const tooltipDismissed = localStorage.getItem('longPressTooltipDismissed');
+    if (tooltipDismissed === 'true') {
+      setShowTooltip(false);
+    }
+  }, []);
 
   // Long Press Handler
   const handleLongPressStart = (verseNumber) => {
@@ -272,35 +272,35 @@ useEffect(() => {
   return (
     <>
 
-    {showTooltip && (
-  <div className="fixed top-0 left-0 right-0 z-50 flex justify-center">
-    <div className={`
+      {showTooltip && (
+        <div className="fixed top-0 left-0 right-0 z-50 flex justify-center">
+          <div className={`
       mt-4 p-4 rounded-lg shadow-lg 
       flex items-center justify-between
       max-w-md w-full
-      ${isDarkMode 
-        ? 'bg-blue-900 text-blue-200' 
-        : 'bg-blue-500 text-white'}
+      ${isDarkMode
+              ? 'bg-blue-900 text-blue-200'
+              : 'bg-blue-500 text-white'}
       animate-bounce
     `}>
-      <div className="flex items-center space-x-2">
-        <span>💡</span>
-        <p>Tahan ayat untuk menandai terakhir dibaca</p>
-      </div>
-      <button 
-        onClick={handleCloseTooltip}
-        className={`
+            <div className="flex items-center space-x-2">
+              <span>💡</span>
+              <p>Tahan ayat untuk menandai terakhir dibaca</p>
+            </div>
+            <button
+              onClick={handleCloseTooltip}
+              className={`
           p-1 rounded-full
-          ${isDarkMode 
-            ? 'hover:bg-blue-800' 
-            : 'hover:bg-blue-600'}
+          ${isDarkMode
+                  ? 'hover:bg-blue-800'
+                  : 'hover:bg-blue-600'}
         `}
-      >
-        <FaTimes />
-      </button>
-    </div>
-  </div>
-)}
+            >
+              <FaTimes />
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Long Press Modal */}
       {longPressVerse && (
@@ -346,8 +346,8 @@ useEffect(() => {
           <div className={`
             p-6 rounded-lg w-80 text-center
             ${isDarkMode
-              ? 'bg-green-900 text-green-300'
-              : 'bg-green-500 text-white'}
+              ? 'bg-neutral-900 text-neutral-200'
+              : 'bg-blue-500 text-white'}
           `}>
             <FaCheck className="mx-auto text-4xl mb-4" />
             <h2 className="text-lg font-bold mb-2">
@@ -429,22 +429,20 @@ useEffect(() => {
               {surah.verses.map((verse, i) => (
                 <div
                   key={i}
-                  onTouchStart={() => handleLongPressStart(i + 1)}
-                  onTouchEnd={handleLongPressEnd}
-                  onMouseDown={() => handleLongPressStart(i + 1)}
-                  onMouseUp={handleLongPressEnd}
-                  onMouseLeave={handleLongPressEnd}
+                  onClick={() => setLongPressVerse(i + 1)}
                   className={`
-    cursor-pointer 
-    p-2 rounded-lg 
-    transition-colors 
-    ${selectedVerse === i + 1
+  cursor-pointer 
+  p-2 rounded-lg 
+  transition-colors
+  ${isDarkMode ? 'hover:bg-neutral-600' : 'hover:bg-neutral-300'}
+  ${selectedVerse === i + 1
                       ? (isDarkMode
-                        ? 'bg-blue-900/50 border-l-4 border-blue-500'
+                        ? 'bg-neutral-800 border-l-4 border-neutal-500'
                         : 'bg-blue-100 border-l-4 border-blue-500')
                       : ''
                     }
-  `}
+`}
+
                 >
                   <div className="flex justify-between items-center mb-4">
                     <div className="flex items-center space-x-2">
@@ -458,7 +456,7 @@ useEffect(() => {
                         {i + 1}
                       </span>
                       {selectedVerse === i + 1 && (
-                        <FaCheck className="text-blue-500" />
+                        <FaCheck className={`${isDarkMode ? 'text-slate-300' : 'text-blue-500'}`} />
                       )}
                     </div>
                     <button
