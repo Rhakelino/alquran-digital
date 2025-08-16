@@ -72,7 +72,7 @@ function SurahDetail() {
           // Scroll the element into view
           element.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
-      }, 100);
+      }, 1000);
     }
   }, [loading, scrollToVerse, surah]);
 
