@@ -51,11 +51,13 @@ function LastRead() {
     });
   };
 
-  const handleNavigateToSurah = () => {
-    if (lastRead) {
-      navigate(`/quran/surah/${lastRead.surahNumber}`);
-    }
-  };
+ // Ubah fungsi handleNavigateToSurah
+const handleNavigateToSurah = () => {
+  if (lastRead) {
+    // Tambahkan parameter query 'ayat' untuk scroll otomatis
+    navigate(`/quran/surah/${lastRead.surahNumber}?ayat=${lastRead.verseNumber}`);
+  }
+};
 
   const clearLastRead = () => {
     localStorage.removeItem('lastRead');

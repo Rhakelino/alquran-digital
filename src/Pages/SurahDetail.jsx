@@ -1,5 +1,5 @@
-import { Link, useParams, useNavigate } from 'react-router-dom';
-import { useEffect, useState, useCallback } from 'react';
+import { Link, useParams, useNavigate, useLocation } from 'react-router-dom';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import axios from 'axios';
 import { IoHome } from "react-icons/io5";
 import { FaPlay } from "react-icons/fa";
@@ -12,6 +12,7 @@ import { FaTimes } from "react-icons/fa";
 function SurahDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation(); // Added for query params
   const [surah, setSurah] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -31,7 +32,12 @@ function SurahDetail() {
   const [longPressVerse, setLongPressVerse] = useState(null);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showTooltip, setShowTooltip] = useState(true);
-
+  
+  // State for storing the verse to scroll to
+  const [scrollToVerse, setScrollToVerse] = useState(null);
+  
+  // Refs for verses
+  const verseRefs = useRef({});
 
   const handleCloseTooltip = () => {
     setShowTooltip(false);
@@ -45,6 +51,30 @@ function SurahDetail() {
     }
   }, []);
 
+  // Effect to extract ayat parameter from URL
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const ayatParam = searchParams.get('ayat');
+    if (ayatParam) {
+      const verseNum = parseInt(ayatParam);
+      setScrollToVerse(verseNum);
+      setSelectedVerse(verseNum);
+    }
+  }, [location.search]);
+
+  // Effect to scroll to the specified verse after loading
+  useEffect(() => {
+    if (!loading && scrollToVerse && surah) {
+      // Use a small timeout to ensure DOM is fully rendered
+      setTimeout(() => {
+        const element = verseRefs.current[scrollToVerse];
+        if (element) {
+          // Scroll the element into view
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 100);
+    }
+  }, [loading, scrollToVerse, surah]);
 
   // Confirm Last Read
   const confirmLastRead = () => {
@@ -57,7 +87,7 @@ function SurahDetail() {
       // Auto-hide success modal after 2 seconds
       setTimeout(() => {
         setShowSuccessModal(false);
-      }, 2000);
+      }, 1000);
     }
   };
 
@@ -258,18 +288,17 @@ function SurahDetail() {
 
   return (
     <>
-
       {showTooltip && (
         <div className="fixed top-0 left-0 right-0 z-50 flex justify-center">
           <div className={`
-      mt-4 p-4 rounded-lg shadow-lg 
-      flex items-center justify-between
-      max-w-md w-full
-      ${isDarkMode
+            mt-4 p-4 rounded-lg shadow-lg 
+            flex items-center justify-between
+            max-w-md w-full
+            ${isDarkMode
               ? 'bg-blue-900 text-blue-200'
               : 'bg-blue-500 text-white'}
-      animate-bounce
-    `}>
+            animate-bounce
+          `}>
             <div className="flex items-center space-x-2">
               <span>💡</span>
               <p>Tahan ayat untuk menandai terakhir dibaca</p>
@@ -277,11 +306,11 @@ function SurahDetail() {
             <button
               onClick={handleCloseTooltip}
               className={`
-          p-1 rounded-full
-          ${isDarkMode
+                p-1 rounded-full
+                ${isDarkMode
                   ? 'hover:bg-blue-800'
                   : 'hover:bg-blue-600'}
-        `}
+              `}
             >
               <FaTimes />
             </button>
@@ -416,20 +445,21 @@ function SurahDetail() {
               {surah.verses.map((verse, i) => (
                 <div
                   key={i}
+                  id={`ayat-${i+1}`}
+                  ref={el => verseRefs.current[i+1] = el}
                   onClick={() => setLongPressVerse(i + 1)}
                   className={`
-  cursor-pointer 
-  p-2 rounded-lg 
-  transition-colors
-  ${isDarkMode ? 'hover:bg-neutral-600' : 'hover:bg-neutral-300'}
-  ${selectedVerse === i + 1
+                    cursor-pointer 
+                    p-2 rounded-lg 
+                    transition-colors
+                    ${isDarkMode ? 'hover:bg-neutral-600' : 'hover:bg-neutral-300'}
+                    ${selectedVerse === i + 1
                       ? (isDarkMode
                         ? 'bg-neutral-800 border-l-4 border-neutal-500'
                         : 'bg-blue-100 border-l-4 border-blue-500')
                       : ''
                     }
-`}
-
+                  `}
                 >
                   <div className="flex justify-between items-center mb-4">
                     <div className="flex items-center space-x-2">
