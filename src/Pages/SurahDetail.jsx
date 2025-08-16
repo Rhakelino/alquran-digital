@@ -1,5 +1,5 @@
 import { Link, useParams, useNavigate } from 'react-router-dom';
-import { useEffect, useState, useCallback, useRef } from 'react'; // Add useRef here
+import { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
 import { IoHome } from "react-icons/io5";
 import { FaPlay } from "react-icons/fa";
@@ -7,7 +7,7 @@ import { FaPause } from "react-icons/fa";
 import { CiDark } from "react-icons/ci";
 import { CiLight } from "react-icons/ci";
 import { FaCheck } from "react-icons/fa";
-import { FaTimes } from "react-icons/fa"; // Add this import
+import { FaTimes } from "react-icons/fa";
 
 function SurahDetail() {
   const { id } = useParams();
@@ -30,7 +30,6 @@ function SurahDetail() {
   // New states for long press and success modal
   const [longPressVerse, setLongPressVerse] = useState(null);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
-  const longPressTimerRef = useRef(null);
   const [showTooltip, setShowTooltip] = useState(true);
 
 
@@ -46,18 +45,6 @@ function SurahDetail() {
     }
   }, []);
 
-  // Long Press Handler
-  const handleLongPressStart = (verseNumber) => {
-    longPressTimerRef.current = setTimeout(() => {
-      setLongPressVerse(verseNumber);
-    }, 500); // 500ms long press duration
-  };
-
-  const handleLongPressEnd = () => {
-    if (longPressTimerRef.current) {
-      clearTimeout(longPressTimerRef.current);
-    }
-  };
 
   // Confirm Last Read
   const confirmLastRead = () => {
