@@ -1,15 +1,15 @@
-import React, { 
-  useState, 
-  useEffect, 
-  useCallback 
+import React, {
+  useState,
+  useEffect,
+  useCallback
 } from 'react';
-import { 
-  FaMosque, 
-  FaClock, 
-  FaSpinner, 
-  FaMapMarkerAlt, 
+import {
+  FaMosque,
+  FaClock,
+  FaSpinner,
+  FaMapMarkerAlt,
   FaSync,
-  FaExclamationTriangle 
+  FaExclamationTriangle
 } from 'react-icons/fa';
 
 const JadwalSholat = () => {
@@ -50,32 +50,48 @@ const JadwalSholat = () => {
   };
 
   // Fungsi untuk mengambil jadwal sholat
-  const fetchJadwalSholat = useCallback(async (lat, lon) => {
-    setLoading(true);
-    setError(null);
+const fetchJadwalSholat = useCallback(async (lat, lon) => {
+  setLoading(true);
+  setError(null);
 
-    try {
-      const tanggal = new Date();
-      const bulan = tanggal.getMonth() + 1;
-      const tahun = tanggal.getFullYear();
+  try {
+    // Properly format the date
+    const tanggal = new Date();
+    const formattedDate = tanggal.toISOString().split('T')[0]; // YYYY-MM-DD format
 
-      const response = await fetch(
-        `https://api.aladhan.com/v1/calendar/${tahun}/${bulan}?latitude=${lat}&longitude=${lon}&method=2`
-      );
+    // Gunakan metode Kemenag (Egypt method)
+    const method = 5; // Egyptian General Authority of Survey
 
-      if (!response.ok) {
-        throw new Error('Gagal mengambil jadwal sholat');
-      }
+    const response = await fetch(
+      `https://api.aladhan.com/v1/timings/${formattedDate}?latitude=${lat}&longitude=${lon}&method=${method}`
+    );
 
-      const result = await response.json();
-      const hariIni = tanggal.getDate() - 1;
-      setJadwal(result.data[hariIni].timings);
-      setLoading(false);
-    } catch (err) {
-      setError('Gagal mengambil jadwal sholat: ' + err.message);
-      setLoading(false);
+    if (!response.ok) {
+      throw new Error('Gagal mengambil jadwal sholat');
     }
-  }, []);
+
+    const result = await response.json();
+    
+    // Optional: Tambahkan perhitungan manual untuk penyesuaian lokal
+    const jadwalOriginal = result.data.timings;
+    
+    // Contoh penyesuaian manual (opsional)
+    const jadwalAdjusted = {
+      ...jadwalOriginal,
+      // Contoh: Penyesuaian waktu sholat berdasarkan local wisdom
+      // Anda bisa menambahkan offset atau penyesuaian khusus di sini
+      // Misalnya: 
+      // Fajr: tambahkan atau kurangi beberapa menit
+      // Dhuhr: sesuaikan dengan kondisi lokal
+    };
+
+    setJadwal(jadwalAdjusted);
+    setLoading(false);
+  } catch (err) {
+    setError('Gagal mengambil jadwal sholat: ' + err.message);
+    setLoading(false);
+  }
+}, []);
 
   // Fungsi untuk mendapatkan lokasi saat ini
   const handleUpdateLokasi = useCallback(() => {
@@ -96,13 +112,13 @@ const JadwalSholat = () => {
               `https://nominatim.openstreetmap.org/reverse?format=json&lat=${newLokasi.latitude}&lon=${newLokasi.longitude}&accept-language=id`
             );
             const data = await response.json();
-            
+
             // Coba berbagai properti untuk nama kota
-            newLokasi.kota = 
-              data.address.city || 
-              data.address.town || 
+            newLokasi.kota =
+              data.address.city ||
+              data.address.town ||
               data.address.municipality ||
-              data.address.county || 
+              data.address.county ||
               'Lokasi Tidak Dikenal';
 
             console.log('Lokasi Terdeteksi:', newLokasi);
@@ -159,8 +175,8 @@ const JadwalSholat = () => {
       <div className="flex items-center">
         <FaExclamationTriangle className="mr-2" />
         {error}
-        <button 
-          onClick={handleUpdateLokasi} 
+        <button
+          onClick={handleUpdateLokasi}
           className="ml-4 bg-red-500 text-white px-3 py-1 rounded"
         >
           Coba Lagi
@@ -171,53 +187,53 @@ const JadwalSholat = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 p-4 flex items-center justify-center">
-  <div className="w-full max-w-md bg-gray-800 rounded-2xl shadow-2xl overflow-hidden">
-    {/* Header */}
-    <div className="bg-gray-700 text-white p-6">
-      <div className="flex items-center justify-center mb-2">
-        <FaMosque className="mr-2 text-2xl" />
-        <h1 className="text-2xl font-bold text-white">Jadwal Sholat</h1>
-      </div>
-      <div className="flex items-center justify-center">
-        <FaMapMarkerAlt className="mr-2" />
-        <span className="text-white font-medium">{lokasi.kota}</span>
-      </div>
-      
-      {/* Jam Digital */}
-      <div className="text-center mt-4 text-sm text-gray-300">
-        {formatWaktu(waktuSekarang)}
-      </div>
-    </div>
-
-    {/* Tombol Refresh */}
-    <div className="p-4 text-center">
-      <button 
-        onClick={handleUpdateLokasi}
-        className="bg-gray-600 text-white px-6 py-2 rounded-lg flex items-center mx-auto hover:bg-gray-700 transition-colors"
-      >
-        <FaSync className="mr-2" /> Perbarui Lokasi
-      </button>
-    </div>
-
-    {/* Jadwal Sholat */}
-    <div className="p-4 space-y-3">
-      {waktuSholat.map((sholat) => (
-        <div 
-          key={sholat.nama} 
-          className="flex justify-between items-center bg-gray-700 p-3 rounded-lg hover:bg-gray-600 transition-colors"
-        >
-          <div className="flex items-center">
-            <span className="text-2xl mr-3">{sholat.icon}</span>
-            <span className="text-white font-medium">{sholat.nama}</span>
+      <div className="w-full max-w-md bg-gray-800 rounded-2xl shadow-2xl overflow-hidden">
+        {/* Header */}
+        <div className="bg-gray-700 text-white p-6">
+          <div className="flex items-center justify-center mb-2">
+            <FaMosque className="mr-2 text-2xl" />
+            <h1 className="text-2xl font-bold text-white">Jadwal Sholat</h1>
           </div>
-          <span className="font-bold text-blue-300">
-            {jadwal ? jadwal[sholat.key].split(' ')[0] : '-'}
-          </span>
+          <div className="flex items-center justify-center">
+            <FaMapMarkerAlt className="mr-2" />
+            <span className="text-white font-medium">{lokasi.kota}</span>
+          </div>
+
+          {/* Jam Digital */}
+          <div className="text-center mt-4 text-sm text-gray-300">
+            {formatWaktu(waktuSekarang)}
+          </div>
         </div>
-      ))}
+
+        {/* Tombol Refresh */}
+        <div className="p-4 text-center">
+          <button
+            onClick={handleUpdateLokasi}
+            className="bg-gray-600 text-white px-6 py-2 rounded-lg flex items-center mx-auto hover:bg-gray-700 transition-colors"
+          >
+            <FaSync className="mr-2" /> Perbarui Lokasi
+          </button>
+        </div>
+
+        {/* Jadwal Sholat */}
+        <div className="p-4 space-y-3">
+          {waktuSholat.map((sholat) => (
+            <div
+              key={sholat.nama}
+              className="flex justify-between items-center bg-gray-700 p-3 rounded-lg hover:bg-gray-600 transition-colors"
+            >
+              <div className="flex items-center">
+                <span className="text-2xl mr-3">{sholat.icon}</span>
+                <span className="text-white font-medium">{sholat.nama}</span>
+              </div>
+              <span className="font-bold text-blue-300">
+                {jadwal ? jadwal[sholat.key].split(' ')[0] : '-'}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
-  </div>
-</div>
   );
 };
 
