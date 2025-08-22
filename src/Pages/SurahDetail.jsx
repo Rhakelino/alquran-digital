@@ -8,6 +8,7 @@ import { CiDark } from "react-icons/ci";
 import { CiLight } from "react-icons/ci";
 import { FaCheck } from "react-icons/fa";
 import { FaTimes } from "react-icons/fa";
+import { GrFormNextLink } from 'react-icons/gr';
 
 function SurahDetail() {
   const { id } = useParams();
@@ -32,10 +33,10 @@ function SurahDetail() {
   const [longPressVerse, setLongPressVerse] = useState(null);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showTooltip, setShowTooltip] = useState(true);
-  
+
   // State for storing the verse to scroll to
   const [scrollToVerse, setScrollToVerse] = useState(null);
-  
+
   // Refs for verses
   const verseRefs = useRef({});
 
@@ -250,6 +251,16 @@ function SurahDetail() {
     });
   };
 
+  // Go to next surah
+  const goToNextSurah = () => {
+    const nextSurahId = parseInt(id) + 1;
+    if (nextSurahId <= 114) {
+      navigate(`/quran/surah/${nextSurahId}`);
+    } else {
+      navigate('/quran');
+    }
+  };
+
   // Komponen peringatan offline
   const OfflineWarning = () => (
     <div className={`
@@ -278,7 +289,7 @@ function SurahDetail() {
         <p>{error}</p>
         <button
           onClick={() => window.location.reload()}
-          className="mt-4 px-4 py-2 bg-blue-500 text-white rounded"
+          className="mt-4 px-4 py-2 bg-teal-500 text-white rounded"
         >
           Muat Ulang
         </button>
@@ -295,8 +306,8 @@ function SurahDetail() {
             flex items-center justify-between
             max-w-md w-full
             ${isDarkMode
-              ? 'bg-blue-900 text-blue-200'
-              : 'bg-blue-500 text-white'}
+              ? 'bg-teal-900 text-teal-200'
+              : 'bg-teal-500 text-white'}
             animate-bounce
           `}>
             <div className="flex items-center space-x-2">
@@ -308,8 +319,8 @@ function SurahDetail() {
               className={`
                 p-1 rounded-full
                 ${isDarkMode
-                  ? 'hover:bg-blue-800'
-                  : 'hover:bg-blue-600'}
+                  ? 'hover:bg-teal-800'
+                  : 'hover:bg-teal-600'}
               `}
             >
               <FaTimes />
@@ -347,7 +358,7 @@ function SurahDetail() {
               </button>
               <button
                 onClick={confirmLastRead}
-                className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                className="flex items-center gap-2 px-4 py-2 bg-teal-500 text-white rounded hover:bg-teal-600"
               >
                 <FaCheck /> Simpan
               </button>
@@ -363,7 +374,7 @@ function SurahDetail() {
             p-6 rounded-lg w-80 text-center
             ${isDarkMode
               ? 'bg-neutral-900 text-neutral-200'
-              : 'bg-blue-500 text-white'}
+              : 'bg-teal-500 text-white'}
           `}>
             <FaCheck className="mx-auto text-4xl mb-4" />
             <h2 className="text-lg font-bold mb-2">
@@ -386,8 +397,6 @@ function SurahDetail() {
       `}>
         <div className="container mx-auto md:px-4 md:py-8 max-w-3xl">
           <div className={`
-            md:rounded-xl 
-            shadow-2xl 
             p-6 
             ${isDarkMode
               ? 'bg-black text-gray-300 border border-[#2C2C2C]'
@@ -396,36 +405,24 @@ function SurahDetail() {
             transition-all duration-300
           `}>
             {/* Header Surah */}
-            <div className="flex justify-between items-center mb-6">
-              <Link to={'/'}>
-                <IoHome className={`
-                  text-2xl 
-                  ${isDarkMode ? 'text-gray-400 hover:text-gray-200' : 'text-gray-600 hover:text-gray-800'}
-                  transition-colors
-                `} />
+            <div className={`sticky top-0 z-10 flex justify-between items-center py-4 ${isDarkMode ? 'bg-black' : 'bg-white'} mb-6`}>
+              <Link to={'/quran'} className="flex items-center space-x-4">
+                <IoHome className={`text-2xl ${isDarkMode ? 'text-gray-400 hover:text-gray-200' : 'text-gray-600 hover:text-gray-800'} transition-colors`} />
+                <div className="flex gap-3 items-center">
+                  <h1 className={`text-xl font-medium ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}>
+                    {surah.name.transliteration.id}
+                  </h1>
+                  <h1 className={`text-lg font-medium ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}>
+                    {surah.number}
+                  </h1>
+                </div>
               </Link>
-              <button
-                onClick={toggleMode}
-                className={`
-                  p-2 rounded-full transition-colors 
-                  ${isDarkMode
-                    ? 'bg-neutral-800 text-gray-300 hover:bg-neutral-700'
-                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                  }
-                `}
-              >
+              <button onClick={toggleMode} className={`p-2 rounded-full transition-colors ${isDarkMode ? 'bg-neutral-800 text-gray-300 hover:bg-neutral-700' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}>
                 {isDarkMode ? <CiLight className='text-2xl' /> : <CiDark className='text-2xl' />}
               </button>
             </div>
-
             {/* Informasi Surah */}
             <div className="text-center mb-8">
-              <h1 className={`
-                text-xl font-medium 
-                ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}
-              `}>
-                {surah.name.transliteration.id}
-              </h1>
               <p className={`
                 font-[Amiri] text-2xl 
                 ${isDarkMode ? 'text-gray-300' : 'text-gray-800'}
@@ -445,8 +442,8 @@ function SurahDetail() {
               {surah.verses.map((verse, i) => (
                 <div
                   key={i}
-                  id={`ayat-${i+1}`}
-                  ref={el => verseRefs.current[i+1] = el}
+                  id={`ayat-${i + 1}`}
+                  ref={el => verseRefs.current[i + 1] = el}
                   onClick={() => setLongPressVerse(i + 1)}
                   className={`
                     cursor-pointer 
@@ -455,7 +452,7 @@ function SurahDetail() {
                     ${selectedVerse === i + 1
                       ? (isDarkMode
                         ? 'bg-neutral-800 border-l-4 border-neutal-500'
-                        : 'bg-blue-100 border-l-4 border-blue-500')
+                        : 'bg-teal-100 border-l-4 border-teal-500')
                       : ''
                     }
                   `}
@@ -472,7 +469,7 @@ function SurahDetail() {
                         {i + 1}
                       </span>
                       {selectedVerse === i + 1 && (
-                        <FaCheck className={`${isDarkMode ? 'text-slate-300' : 'text-blue-500'}`} />
+                        <FaCheck className={`${isDarkMode ? 'text-slate-300' : 'text-teal-500'}`} />
                       )}
                     </div>
                     <button
@@ -514,6 +511,14 @@ function SurahDetail() {
                 </div>
               ))}
             </div>
+            {/* Tombol Next */}
+            {surah && (
+              <div className="flex justify-end mt-8">
+                <button onClick={goToNextSurah} className={`flex gap-2 px-4 py-2 ${isDarkMode ? "bg-neutral-700 hover:bg-neutral-600" : "bg-teal-500 hover:bg-teal-600"} text-white rounded `}>
+                    Lanjut Surah ke-{parseInt(id) + 1 <= 114 ? parseInt(id) + 1 : 'awal'} <GrFormNextLink className='text-2xl' />
+                </button>
+              </div>
+            )}
           </div>
 
           {/* Footer */}
@@ -522,9 +527,7 @@ function SurahDetail() {
             ${isDarkMode ? 'text-gray-500' : 'text-gray-600'}
           `}>
             <p className='font-medium'>
-              {selectedVerse
-                ? `Terakhir dibaca ayat ${selectedVerse}`
-                : 'Made With ❤️ By Rhakelino'}
+             Designed by Rhakelino with Allah permission 
             </p>
           </footer>
         </div>

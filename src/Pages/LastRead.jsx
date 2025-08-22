@@ -148,23 +148,11 @@ const handleNavigateToSurah = () => {
                 px-6 py-3 rounded-lg
                 ${isDarkMode
                   ? 'bg-neutral-700 text-neutral-200 hover:bg-neutral-600'
-                  : 'bg-blue-500 text-white hover:bg-blue-600'
+                  : 'bg-teal-500 text-white hover:bg-teal-600'
                 }
               `}
             >
               Lanjutkan Membaca
-            </button>
-            <button
-              onClick={clearLastRead}
-              className={`
-                px-6 py-3 rounded-lg
-                ${isDarkMode
-                  ? 'bg-red-600 text-white hover:bg-red-700'
-                  : 'bg-red-500 text-white hover:bg-red-600'
-                }
-              `}
-            >
-              Hapus Terakhir Baca
             </button>
           </div>
         </div>

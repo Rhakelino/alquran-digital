@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 import { CiDark } from "react-icons/ci";
 import { CiLight } from "react-icons/ci";
 import { FaSearch } from "react-icons/fa";
+import { IoHome } from 'react-icons/io5';
 
 function Home() {
     const [surahs, setSurah] = useState([]);
@@ -70,13 +71,10 @@ function Home() {
 `}>
                     {/* Header */}
                     <div className="flex justify-between items-center mb-6">
-                        <div>
-                            <h1 className={`
-                                text-md font-bold 
-                                ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}
-                            `}>
-                                Al Quran
-                            </h1>
+                        <div className='flex items-center space-x-4'>
+                            <Link to={'/'} className="flex items-center space-x-4">
+                                <IoHome className={`text-2xl ${isDarkMode ? 'text-gray-400 hover:text-gray-200' : 'text-gray-600 hover:text-gray-800'} transition-colors`} />
+                            </Link>
                             <h2 className={`
                                 text-2xl font-semibold 
                                 ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}
