@@ -17,7 +17,6 @@ function SurahDetail() {
   const [surah, setSurah] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [isOffline, setIsOffline] = useState(false);
 
   // State untuk mengontrol audio
   const [playing, setPlaying] = useState(null);
@@ -261,16 +260,6 @@ function SurahDetail() {
     }
   };
 
-  // Komponen peringatan offline
-  const OfflineWarning = () => (
-    <div className={`
-      fixed top-0 left-0 right-0 
-      bg-yellow-500 text-white 
-      text-center p-2 z-50
-    `}>
-      Anda sedang offline. Menggunakan data tersimpan.
-    </div>
-  );
 
   // Handling loading
   if (loading) {
@@ -386,7 +375,6 @@ function SurahDetail() {
           </div>
         </div>
       )}
-      {isOffline && <OfflineWarning />}
       <div className={`
         min-h-screen 
         ${isDarkMode
