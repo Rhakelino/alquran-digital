@@ -393,19 +393,34 @@ function SurahDetail() {
             transition-all duration-300
           `}>
             {/* Header Surah */}
-            <div className={`sticky top-0 z-10 flex justify-between items-center py-4 ${isDarkMode ? 'bg-black' : 'bg-white'} mb-6`}>
-              <Link to={'/quran'} className="flex items-center space-x-4">
+            <div className={`sticky top-0 z-10 flex justify-between items-center px-4 py-3 ${isDarkMode ? 'bg-black' : 'bg-white'} shadow-sm`}>
+              {/* Left Side - Home Button */}
+              <Link to={'/quran'} className="flex items-center">
                 <IoHome className={`text-2xl ${isDarkMode ? 'text-gray-400 hover:text-gray-200' : 'text-gray-600 hover:text-gray-800'} transition-colors`} />
-                <div className="flex gap-3 items-center">
-                  <h1 className={`text-xl font-medium ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}>
+              </Link>
+
+              {/* Center - Surah Information */}
+              <div className="flex flex-col items-center text-center">
+                <div className="flex items-center gap-2">
+                  <h1 className={`text-xl font-semibold ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}>
                     {surah.name.transliteration.id}
                   </h1>
-                  <h1 className={`text-lg font-medium ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}>
-                    {surah.number}
-                  </h1>
+                  <span className={`text-lg ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                    ({surah.number})
+                  </span>
                 </div>
-              </Link>
-              <button onClick={toggleMode} className={`p-2 rounded-full transition-colors ${isDarkMode ? 'bg-neutral-800 text-gray-300 hover:bg-neutral-700' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}>
+                <h2 className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                  {surah.name.translation.id}
+                </h2>
+              </div>
+              {/* Right Side - Dark Mode Toggle */}
+              <button
+                onClick={toggleMode}
+                className={`p-2 rounded-full transition-colors ${isDarkMode
+                    ? 'bg-neutral-800 text-gray-300 hover:bg-neutral-700'
+                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                  }`}
+              >
                 {isDarkMode ? <CiLight className='text-2xl' /> : <CiDark className='text-2xl' />}
               </button>
             </div>
@@ -503,7 +518,7 @@ function SurahDetail() {
             {surah && (
               <div className="flex justify-end mt-8">
                 <button onClick={goToNextSurah} className={`flex gap-2 px-4 py-2 ${isDarkMode ? "bg-neutral-700 hover:bg-neutral-600" : "bg-teal-500 hover:bg-teal-600"} text-white rounded `}>
-                    Lanjut Surah ke-{parseInt(id) + 1 <= 114 ? parseInt(id) + 1 : 'awal'} <GrFormNextLink className='text-2xl' />
+                  Lanjut Surah ke-{parseInt(id) + 1 <= 114 ? parseInt(id) + 1 : 'awal'} <GrFormNextLink className='text-2xl' />
                 </button>
               </div>
             )}
@@ -515,7 +530,7 @@ function SurahDetail() {
             ${isDarkMode ? 'text-gray-500' : 'text-gray-600'}
           `}>
             <p className='font-medium'>
-             Designed by Rhakelino with Allah permission 
+              Designed by Rhakelino with Allah permission
             </p>
           </footer>
         </div>
